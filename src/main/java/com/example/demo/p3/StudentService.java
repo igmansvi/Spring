@@ -2,7 +2,7 @@ package com.example.demo.p3;
 
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class StudentService {
     private final Student student;
 
