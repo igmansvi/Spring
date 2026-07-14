@@ -30,4 +30,24 @@ public class Portfolio {
                     </div>
                 """;
     }
+
+    @GetMapping("/education")
+    public String education() {
+        return """
+                    <div style="text-align: center; border: 1px solid black; width: 50%; background-color: #FF00FF; color: black;">
+                        <h1> Education </h1>
+                        <ol>
+                            <ul>
+                                <li>B.Tech CSE, Lovely Professional University</li>
+                            </ul>
+                            <ul>
+                                <li>Intermediate, Bihta Public School</li>
+                            </ul>
+                            <ul>
+                                <li>Matriculation, Bihta Public School</li>
+                            </ul>
+                        </ol>
+                    </div>
+                """;
+    }
 }
