@@ -6,17 +6,17 @@ import jakarta.persistence.Id;
 @Entity
 public class Student {
     @Id
-    long Id;
+    long id;
     String name;
     int age;
     String department;
 
     public long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getName() {
@@ -46,7 +46,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "Id=" + Id +
+                "Id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 ", department='" + department + '\'' +
