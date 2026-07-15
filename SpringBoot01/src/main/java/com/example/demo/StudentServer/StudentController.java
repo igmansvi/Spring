@@ -16,12 +16,12 @@ public class StudentController {
         Request: curl.exe -i -X POST http://localhost:8080/student/create -H "Content-type: application/json" -d '{\"id\":101, \"name\":\"mansvi\", \"age\":21, \"department\":\"cse\"}'
      */
     @PostMapping("/create")
-    public ResponseEntity<Student> create(@RequestBody Student student) {
-        Student result = studentService.validate(student);
-        if(result == null) {
-            ResponseEntity.status(400).body("Error: Student Creation Failed, Invalid information!");
+    public ResponseEntity<String> create(@RequestBody Student student) {
+        StudentResponse result = studentService.validate(student);
+        if(!result.success()) {
+            return ResponseEntity.status(400).body(result.message());
         }
-        return ResponseEntity.status(201).body(result);
+        return ResponseEntity.status(201).body(result.message());
     }
 
     // Read the Student by ID
@@ -30,4 +30,3 @@ public class StudentController {
 
     // Delete the student information
 }
-

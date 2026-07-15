@@ -9,17 +9,21 @@ public class StudentService {
 
     public StudentService(StudentRepository studentRepository) { this.studentRepository = studentRepository; }
 
-    public Student validate(Student student) {
+    public StudentResponse validate(Student student) {
         int id = student.getId();
         String name = student.getName();
         int age = student.getAge();
         String department = student.getDepartment();
 
         if(id < 0 || name == null || age < 0 || department == null) {
-            System.out.println("Error: Failed Creation!");
-            return null;
+            return new StudentResponse(false, "Error: Student Creation Failed, Invalid information!", null);
         }
 
-        return studentRepository.save(student);
+        if(studentRepository.existsById(id)) {
+            return new StudentResponse(false, "Already Exists", null);
+        }
+
+        Student created = studentRepository.save(student);
+        return new StudentResponse(true, "Student created successfully!", created);
     }
 }
