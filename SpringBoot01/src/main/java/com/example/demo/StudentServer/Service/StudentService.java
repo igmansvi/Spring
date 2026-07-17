@@ -15,17 +15,25 @@ public class StudentService {
 
     public StudentService(StudentRepository studentRepository) { this.studentRepository = studentRepository; }
 
-    public StudentResponse<Student> validate(Student student) {
+    private boolean isValid(Student student) {
         int id = student.getId();
         String name = student.getName();
         int age = student.getAge();
         String department = student.getDepartment();
 
-        if(id < 0 || name == null || age < 0 || department == null) {
+        return id >= 0 && name != null && age >= 0 && department != null;
+    }
+
+    private boolean doesExists(int id) {
+        return studentRepository.existsById(id);
+    }
+
+    public StudentResponse<Student> validate(Student student) {
+        if(!isValid(student)) {
             return new StudentResponse<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
         }
 
-        if(studentRepository.existsById(id)) {
+        if(doesExists(student.getId())) {
             return new StudentResponse<Student>(false, "Already Exists!", null);
         }
 
@@ -41,11 +49,37 @@ public class StudentService {
         return new StudentResponse<List<Student>>(true, "All students data!", students);
     }
 
-    public  StudentResponse<Student> getById(int id) {
+    public StudentResponse<Student> getById(int id) {
         Optional<Student> student = studentRepository.findById(id);
         if(student.isEmpty()) {
-            return new StudentResponse<Student>(false, "Student: "+id+" does not exists!", null);
+            return new StudentResponse<Student>(false, "Student: " + id + " does not exists!", null);
         }
-        return new StudentResponse<Student>(true, "Student: "+id, student.get());
+        return new StudentResponse<Student>(true, "Student: " + id, student.get());
+    }
+
+    public StudentResponse<Student> update(Student student, int id) {
+        if(!isValid(student)) {
+            return new StudentResponse<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
+        }
+
+        if(id != student.getId()) {
+            return new StudentResponse<Student>(false, "Invalid request body!", null);
+        }
+
+        if(!doesExists(student.getId())) {
+            return new StudentResponse<Student>(false, "Student: " + id +" does not exists!", null);
+        }
+
+        Student updated = studentRepository.save(student);
+        return new StudentResponse<Student>(true, "Student: " + id + " updated successfully!", updated);
+    }
+
+    public StudentResponse<Student> delete(int id) {
+        if(!doesExists(id)) {
+            return new StudentResponse<Student>(false, "Student: " + id +" does not exists!", null);
+        }
+
+        studentRepository.deleteById(id);
+        return new StudentResponse<Student>(true, "Student: "+ id + " deleted successfully!", null);
     }
 }

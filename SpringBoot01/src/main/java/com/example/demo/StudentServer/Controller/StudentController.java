@@ -30,6 +30,7 @@ public class StudentController {
         return ResponseEntity.status(201).body(result);
     }
 
+    // Real all students
     @GetMapping
     public ResponseEntity<StudentResponse<List<Student>>> all() {
         StudentResponse<List<Student>> result = studentService.getAll();
@@ -39,6 +40,7 @@ public class StudentController {
         return ResponseEntity.status(200).body(result);
     }
 
+    // Read the Student by ID
     @GetMapping("/{id}")
     public ResponseEntity<StudentResponse<Student>> getById(@PathVariable int id) {
         StudentResponse<Student> result = studentService.getById(id);
@@ -48,9 +50,23 @@ public class StudentController {
         return ResponseEntity.status(200).body(result);
     }
 
-    // Read the Student by ID
-
     // Update the student information
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentResponse<Student>> update(@RequestBody Student student, @PathVariable int id) {
+        StudentResponse<Student> result = studentService.update(student, id);
+        if(!result.success()) {
+            return ResponseEntity.status(400).body(result);
+        }
+        return ResponseEntity.status(200).body(result);
+    }
 
     // Delete the student information
+    @DeleteMapping("/{id}")
+    public ResponseEntity<StudentResponse<Student>> delete(@PathVariable int id) {
+        StudentResponse<Student> result = studentService.delete(id);
+        if(!result.success()) {
+            return ResponseEntity.status(400).body(result);
+        }
+        return  ResponseEntity.status(200).body(result);
+    }
 }
