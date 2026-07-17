@@ -1,5 +1,6 @@
-package com.example.demo.StudentServer;
+package com.example.demo.StudentServer.Repository;
 
+import com.example.demo.StudentServer.Entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
