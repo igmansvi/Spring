@@ -1,8 +1,9 @@
 package com.example.demo.StudentServer.Service;
 
+import com.example.demo.StudentServer.Dto.StudentRequestDTO;
 import com.example.demo.StudentServer.Entity.Student;
 import com.example.demo.StudentServer.Repository.StudentRepository;
-import com.example.demo.StudentServer.Dto.StudentResponse;
+import com.example.demo.StudentServer.Dto.StudentResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,71 +16,79 @@ public class StudentService {
 
     public StudentService(StudentRepository studentRepository) { this.studentRepository = studentRepository; }
 
-    private boolean isValid(Student student) {
-        int id = student.getId();
-        String name = student.getName();
-        int age = student.getAge();
-        String department = student.getDepartment();
+    private boolean isValid(StudentRequestDTO studentRequestDTO) {
+        if(studentRequestDTO == null) {
+            return false;
+        }
 
-        return id >= 0 && name != null && age >= 0 && department != null;
+        String name = studentRequestDTO.name();
+        int age = studentRequestDTO.age();
+        String department = studentRequestDTO.department();
+
+        return name != null && age >= 0 && department != null;
     }
 
     private boolean doesExists(int id) {
         return studentRepository.existsById(id);
     }
 
-    public StudentResponse<Student> validate(Student student) {
-        if(!isValid(student)) {
-            return new StudentResponse<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
+    private Student toStudent(StudentRequestDTO studentRequestDTO) {
+        Student student = new Student();
+        student.setName(studentRequestDTO.name());
+        student.setAge(studentRequestDTO.age());
+        student.setDepartment(studentRequestDTO.department());
+        return student;
+    }
+
+    public StudentResponseDTO<Student> validate(StudentRequestDTO studentRequestDTO) {
+        if(!isValid(studentRequestDTO)) {
+            return new StudentResponseDTO<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
         }
 
-        if(doesExists(student.getId())) {
-            return new StudentResponse<Student>(false, "Already Exists!", null);
-        }
+        Student student = toStudent(studentRequestDTO);
 
         Student created = studentRepository.save(student);
-        return new StudentResponse<Student>(true, "Student created successfully!", created);
+        return new StudentResponseDTO<Student>(true, "Student created successfully!", created);
     }
 
-    public StudentResponse<List<Student>> getAll() {
+    public StudentResponseDTO<List<Student>> getAll() {
         List<Student> students = studentRepository.findAll();
         if(students.isEmpty()) {
-            return new StudentResponse<List<Student>>(false, "No students exists!", null);
+            return new StudentResponseDTO<List<Student>>(false, "No students exists!", null);
         }
-        return new StudentResponse<List<Student>>(true, "All students data!", students);
+        return new StudentResponseDTO<List<Student>>(true, "All students data!", students);
     }
 
-    public StudentResponse<Student> getById(int id) {
+    public StudentResponseDTO<Student> getById(int id) {
         Optional<Student> student = studentRepository.findById(id);
         if(student.isEmpty()) {
-            return new StudentResponse<Student>(false, "Student: " + id + " does not exists!", null);
+            return new StudentResponseDTO<Student>(false, "Student: " + id + " does not exists!", null);
         }
-        return new StudentResponse<Student>(true, "Student: " + id, student.get());
+        return new StudentResponseDTO<Student>(true, "Student: " + id, student.get());
     }
 
-    public StudentResponse<Student> update(Student student, int id) {
-        if(!isValid(student)) {
-            return new StudentResponse<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
+    public StudentResponseDTO<Student> update(StudentRequestDTO studentRequestDTO, int id) {
+        if(!isValid(studentRequestDTO)) {
+            return new StudentResponseDTO<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
         }
 
-        if(id != student.getId()) {
-            return new StudentResponse<Student>(false, "Invalid request body!", null);
-        }
+        Student student = toStudent(studentRequestDTO);
+        student.setId(id);
 
-        if(!doesExists(student.getId())) {
-            return new StudentResponse<Student>(false, "Student: " + id +" does not exists!", null);
+        if(!doesExists(id)) {
+            return new StudentResponseDTO<Student>(false, "Student: " + id +" does not exists!", null);
         }
 
         Student updated = studentRepository.save(student);
-        return new StudentResponse<Student>(true, "Student: " + id + " updated successfully!", updated);
+        return new StudentResponseDTO<Student>(true, "Student: " + id + " updated successfully!", updated);
     }
 
-    public StudentResponse<Student> delete(int id) {
+    public StudentResponseDTO<Student> delete(int id) {
         if(!doesExists(id)) {
-            return new StudentResponse<Student>(false, "Student: " + id +" does not exists!", null);
+            return new StudentResponseDTO<Student>(false, "Student: " + id +" does not exists!", null);
         }
 
         studentRepository.deleteById(id);
-        return new StudentResponse<Student>(true, "Student: "+ id + " deleted successfully!", null);
+        return new StudentResponseDTO<Student>(true, "Student: "+ id + " deleted successfully!", null);
     }
 }

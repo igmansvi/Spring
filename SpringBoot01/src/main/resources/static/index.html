@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#FAF9F6',
+                        ink: '#1E1D1A',
+                        muted: '#77746C',
+                        line: '#E4E1D8',
+                        pine: '#33473D',
+                        pineDark: '#243530',
+                        rust: '#A8471F',
+                    },
+                    fontFamily: {
+                        serif: ['Lora', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { background-color: #FAF9F6; }
+        ::selection { background: #33473D; color: #FAF9F6; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        input:focus, select:focus { outline: none; box-shadow: none; }
+        .field:focus-within { border-color: #33473D; }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body class="font-sans text-ink min-h-screen">
+
+<div class="max-w-5xl mx-auto px-6 md:px-10 py-12">
+
+    <!-- Header -->
+    <header class="flex items-end justify-between border-b border-line pb-6 mb-8">
+        <div>
+            <p class="text-xs tracking-[0.2em] uppercase text-muted mb-2">Register &middot; est. this term</p>
+            <h1 class="font-serif italic text-4xl md:text-5xl text-ink">Student Registry</h1>
+        </div>
+        <div class="text-right hidden sm:block">
+            <p id="stat-count" class="font-mono text-3xl text-pine tabular-nums">00</p>
+            <p class="text-xs tracking-[0.15em] uppercase text-muted">on record</p>
+        </div>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between mb-8">
+        <div class="field flex items-center gap-2 border border-line bg-white/60 px-4 py-2.5 w-full sm:max-w-sm transition-colors">
+            <svg class="w-4 h-4 text-muted shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+            <input id="search" type="text" placeholder="Search by name or department"
+                   class="bg-transparent w-full text-sm placeholder:text-muted/70">
+        </div>
+        <button id="toggle-form-btn"
+                class="text-sm tracking-wide uppercase px-5 py-2.5 bg-pine text-paper hover:bg-pineDark transition-colors self-start sm:self-auto">
+            + Add student
+        </button>
+    </div>
+
+    <!-- Add / Edit form -->
+    <section id="form-panel" class="hidden fade-in mb-10 border border-line bg-white/60 p-6 md:p-8">
+        <div class="flex items-baseline justify-between mb-6">
+            <h2 id="form-title" class="font-serif italic text-xl text-ink">New entry</h2>
+            <button id="close-form-btn" class="text-xs uppercase tracking-wide text-muted hover:text-ink transition-colors">Cancel</button>
+        </div>
+        <form id="student-form" class="grid sm:grid-cols-3 gap-5">
+            <label class="flex flex-col gap-1.5">
+                <span class="text-xs uppercase tracking-wide text-muted">Full name</span>
+                <input name="name" required maxlength="80" placeholder="e.g. Asha Rao"
+                       class="field border-b border-line bg-transparent py-2 text-sm transition-colors">
+            </label>
+            <label class="flex flex-col gap-1.5">
+                <span class="text-xs uppercase tracking-wide text-muted">Age</span>
+                <input name="age" type="number" required min="1" max="120" placeholder="21"
+                       class="field border-b border-line bg-transparent py-2 text-sm font-mono transition-colors">
+            </label>
+            <label class="flex flex-col gap-1.5">
+                <span class="text-xs uppercase tracking-wide text-muted">Department</span>
+                <input name="department" required list="dept-options" placeholder="e.g. CSE"
+                       class="field border-b border-line bg-transparent py-2 text-sm transition-colors">
+                <datalist id="dept-options">
+                    <option value="CSE"><option value="ECE"><option value="EEE">
+                    <option value="MECH"><option value="CIVIL"><option value="IT">
+                </datalist>
+            </label>
+            <div class="sm:col-span-3 flex items-center gap-3 pt-2">
+                <button type="submit" id="submit-btn"
+                        class="text-sm tracking-wide uppercase px-6 py-2.5 bg-pine text-paper hover:bg-pineDark transition-colors">
+                    Save entry
+                </button>
+                <span id="form-error" class="text-xs text-rust"></span>
+            </div>
+        </form>
+    </section>
+
+    <!-- Message banner -->
+    <div id="banner" class="hidden fade-in mb-6 text-sm border-l-2 pl-3 py-1"></div>
+
+    <!-- Table -->
+    <section>
+        <div class="grid grid-cols-[3.5rem_1fr_4rem_9rem_7rem] gap-4 px-2 pb-3 border-b border-ink/70 text-xs uppercase tracking-wide text-muted">
+            <span>No.</span>
+            <span>Name</span>
+            <span>Age</span>
+            <span>Department</span>
+            <span class="text-right">Actions</span>
+        </div>
+        <div id="table-body"></div>
+
+        <div id="empty-state" class="hidden text-center py-16">
+            <p class="font-serif italic text-lg text-muted mb-1">The register is empty.</p>
+            <p class="text-sm text-muted">Add the first record above to begin.</p>
+        </div>
+        <div id="loading-state" class="text-center py-16">
+            <p class="text-sm text-muted tracking-wide uppercase">Loading register&hellip;</p>
+        </div>
+    </section>
+
+    <footer class="mt-16 pt-6 border-t border-line text-xs text-muted flex justify-between">
+        <span>Student Registry</span>
+        <span id="footer-count" class="font-mono"></span>
+    </footer>
+</div>
+
+<script>
+    const API = '/student';
+    let students = [];
+    let editingId = null;
+
+    const $ = (sel) => document.querySelector(sel);
+    const form = $('#student-form');
+    const formPanel = $('#form-panel');
+    const formTitle = $('#form-title');
+    const formError = $('#form-error');
+    const tableBody = $('#table-body');
+    const emptyState = $('#empty-state');
+    const loadingState = $('#loading-state');
+    const banner = $('#banner');
+    const searchInput = $('#search');
+
+    function showBanner(message, isError) {
+        banner.textContent = message;
+        banner.className = 'fade-in mb-6 text-sm border-l-2 pl-3 py-1 ' +
+            (isError ? 'border-rust text-rust' : 'border-pine text-pine');
+        banner.classList.remove('hidden');
+        setTimeout(() => banner.classList.add('hidden'), 3500);
+    }
+
+    function openForm(mode, student) {
+        formPanel.classList.remove('hidden');
+        formError.textContent = '';
+        if (mode === 'edit' && student) {
+            editingId = student.id;
+            formTitle.textContent = 'Edit entry — No. ' + String(student.id).padStart(3, '0');
+            form.name.value = student.name;
+            form.age.value = student.age;
+            form.department.value = student.department;
+            $('#submit-btn').textContent = 'Update entry';
+        } else {
+            editingId = null;
+            formTitle.textContent = 'New entry';
+            form.reset();
+            $('#submit-btn').textContent = 'Save entry';
+        }
+    }
+
+    function closeForm() {
+        formPanel.classList.add('hidden');
+        form.reset();
+        editingId = null;
+        formError.textContent = '';
+    }
+
+    $('#toggle-form-btn').addEventListener('click', () => {
+        if (formPanel.classList.contains('hidden')) openForm('new');
+        else closeForm();
+    });
+    $('#close-form-btn').addEventListener('click', closeForm);
+
+    function renderRows(list) {
+        if (!list.length) {
+            tableBody.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        emptyState.classList.add('hidden');
+        tableBody.innerHTML = list.map((s) => `
+      <div class="grid grid-cols-[3.5rem_1fr_4rem_9rem_7rem] gap-4 px-2 py-3.5 border-b border-line items-center hover:bg-white/50 transition-colors fade-in">
+        <span class="font-mono text-xs text-muted">${String(s.id).padStart(3, '0')}</span>
+        <span class="text-sm">${escapeHtml(s.name)}</span>
+        <span class="font-mono text-sm">${s.age}</span>
+        <span class="text-sm text-muted uppercase tracking-wide">${escapeHtml(s.department)}</span>
+        <span class="flex justify-end gap-3 text-xs uppercase tracking-wide">
+          <button data-edit="${s.id}" class="text-pine hover:text-pineDark transition-colors">Edit</button>
+          <button data-del="${s.id}" class="text-rust/80 hover:text-rust transition-colors">Delete</button>
+        </span>
+      </div>
+    `).join('');
+
+        tableBody.querySelectorAll('[data-edit]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const s = students.find((x) => x.id == btn.dataset.edit);
+                if (s) { openForm('edit', s); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            });
+        });
+        tableBody.querySelectorAll('[data-del]').forEach((btn) => {
+            btn.addEventListener('click', () => deleteStudent(btn.dataset.del));
+        });
+    }
+
+    function escapeHtml(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    function applyFilter() {
+        const q = searchInput.value.trim().toLowerCase();
+        const filtered = q
+            ? students.filter((s) =>
+                s.name.toLowerCase().includes(q) || s.department.toLowerCase().includes(q))
+            : students;
+        renderRows(filtered);
+    }
+    searchInput.addEventListener('input', applyFilter);
+
+    function updateStats() {
+        $('#stat-count').textContent = String(students.length).padStart(2, '0');
+        $('#footer-count').textContent = students.length + ' record' + (students.length === 1 ? '' : 's');
+    }
+
+    async function fetchAll() {
+        loadingState.classList.remove('hidden');
+        try {
+            const res = await fetch(API);
+            const body = await res.json().catch(() => null);
+            if (res.ok && body && body.success) {
+                students = body.data || [];
+            } else {
+                students = [];
+                if (res.status !== 404) showBanner((body && body.message) || 'Could not load the register.', true);
+            }
+        } catch (e) {
+            students = [];
+            showBanner('Could not reach the server. Is it running on port 8080?', true);
+        } finally {
+            loadingState.classList.add('hidden');
+            updateStats();
+            applyFilter();
+        }
+    }
+
+    async function deleteStudent(id) {
+        if (!confirm('Remove this student from the register? This cannot be undone.')) return;
+        try {
+            const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+            const body = await res.json().catch(() => null);
+            if (res.ok && body && body.success) {
+                showBanner((body && body.message) || 'Student removed.', false);
+                await fetchAll();
+            } else {
+                showBanner((body && body.message) || 'Could not remove this record.', true);
+            }
+        } catch (e) {
+            showBanner('Could not reach the server.', true);
+        }
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        formError.textContent = '';
+        const payload = {
+            name: form.name.value.trim(),
+            age: Number(form.age.value),
+            department: form.department.value.trim(),
+        };
+        const submitBtn = $('#submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-60');
+
+        const isEdit = editingId !== null;
+        const url = isEdit ? `${API}/${editingId}` : `${API}/create`;
+        const method = isEdit ? 'PUT' : 'POST';
+
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const body = await res.json().catch(() => null);
+            if (res.ok && body && body.success) {
+                showBanner((body && body.message) || (isEdit ? 'Entry updated.' : 'Entry added.'), false);
+                closeForm();
+                await fetchAll();
+            } else {
+                formError.textContent = (body && body.message) || 'Something went wrong. Check the details and try again.';
+            }
+        } catch (e) {
+            formError.textContent = 'Could not reach the server.';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-60');
+        }
+    });
+
+    fetchAll();
+</script>
+</body>
+</html>
