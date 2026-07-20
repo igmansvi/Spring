@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+@theme {
+  --color-paper: #faf9f6;
+  --color-ink: #1e1d1a;
+  --color-muted: #77746c;
+  --color-line: #e4e1d8;
+  --color-pine: #33473d;
+  --color-pine-dark: #243530;
+  --color-rust: #a8471f;
+
+  --font-serif: 'Lora', serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
