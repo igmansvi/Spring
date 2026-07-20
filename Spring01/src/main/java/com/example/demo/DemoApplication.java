@@ -40,8 +40,8 @@ public class DemoApplication {
 //		student.setId(101);
 //		System.out.println(student.getId() + ", " + student.getName());
 
-		OrderService orderService = context.getBean(OrderService.class);
-		orderService.order();
+//		OrderService orderService = context.getBean(OrderService.class);
+//		orderService.order();
 	}
 
 }
