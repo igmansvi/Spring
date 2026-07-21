@@ -22,19 +22,26 @@ public class StudentService {
         }
 
         String name = studentRequestDTO.name();
+        String email = studentRequestDTO.email();
         int age = studentRequestDTO.age();
         String department = studentRequestDTO.department();
 
-        return name != null && age >= 0 && department != null;
+        return name != null && email != null && age >= 0 && department != null;
     }
 
     private boolean doesExists(int id) {
         return studentRepository.existsById(id);
     }
 
+//    private boolean emailAlreadyExists(StudentRequestDTO studentRequestDTO) {
+//        String email = studentRequestDTO.email();
+//        return studentRepository.existsByEmail(email);
+//    }
+
     private Student toStudent(StudentRequestDTO studentRequestDTO) {
         Student student = new Student();
         student.setName(studentRequestDTO.name());
+        student.setEmail(studentRequestDTO.email());
         student.setAge(studentRequestDTO.age());
         student.setDepartment(studentRequestDTO.department());
         return student;
@@ -44,6 +51,10 @@ public class StudentService {
         if(!isValid(studentRequestDTO)) {
             return new StudentResponseDTO<Student>(false, "Error: Student Creation Failed, Invalid information!", null);
         }
+
+//        if(emailAlreadyExists(studentRequestDTO)) {
+//            return new StudentResponseDTO<>(false, "Email already exists", null);
+//        }
 
         Student student = toStudent(studentRequestDTO);
 

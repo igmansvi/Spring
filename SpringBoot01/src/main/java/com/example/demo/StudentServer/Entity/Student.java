@@ -17,6 +17,11 @@ public class Student {
     @Size(min = 3, max = 255, message = "Name must be between least 3 and 255 characters")
     private String name;
 
+    @Email(message = "Email must be valid")
+    @NotBlank(message = "Email is required")
+    @Column(unique = true)
+    private String email;
+
     @Min(value = 18, message = "Age must be minimum 18 to register as 'Student'")
     @Max(value = 25, message = "Age must be maximum 25 to register as 'Student'")
     private int age;
@@ -37,6 +42,7 @@ public class Student {
         return "Student{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
                 ", age=" + age +
                 ", department='" + department + '\'' +
                 ", created_at=" + created_at +
