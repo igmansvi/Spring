@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Css</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .demo {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            gap: 16px;
+        }
+
+        .card {
+            padding: 20px;
+            border-radius: 14px;
+            background: #ffffff;
+            border: 1px solid #dbe4f0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+        }
+
+        .class-box {
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        #id-box {
+            background: #dcfce7;
+            color: #166534;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .pseudo-link {
+            display: inline-block;
+            color: #7c3aed;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #ede9fe;
+            transition: 0.2s ease;
+        }
+
+        .pseudo-link:hover {
+            background: #7c3aed;
+            color: #ffffff;
+        }
+
+        .parent > p {
+            margin: 0;
+            padding: 12px 14px;
+            border-left: 4px solid #0ea5e9;
+            background: #e0f2fe;
+            border-radius: 8px;
+        }
+
+        .note {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo">
+        <div class="card">
+            <h1>CSS Selector Demo</h1>
+            <p>Class selector</p>
+            <div class="class-box">This box is styled with a class selector.</div>
+        </div>
+
+        <div class="card">
+            <p>Id selector</p>
+            <div id="id-box">This box is styled with an id selector.</div>
+        </div>
+
+        <div class="card">
+            <p>Pseudo selector</p>
+            <a href="#" class="pseudo-link">Hover over me</a>
+        </div>
+
+        <div class="card parent">
+            <p>Parent child selector</p>
+            <p>This paragraph is selected by .parent &gt; p</p>
+            <div>
+                <p>This paragraph is not a direct child and stays different.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <p>Specificity and inline style</p>
+            <div class="class-box" id="id-box" style="background: #fecaca; color: #991b1b;">
+                Inline style overrides id and class.
+            </div>
+            <div class="note">Priority: class &lt; id &lt; inline</div>
+        </div>
+    </div>
+</body>
+</html>
